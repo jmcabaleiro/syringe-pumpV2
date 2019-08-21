@@ -1,0 +1,397 @@
+This software has been developed by Emanuel Elizalde. Translation to english coming soon.
+
+Introduccion:
+────────────
+
+A fin de establecer una velocidad de avance del carro, la placa Arduino
+genera una onda cuadrada. Esta onda funciona como un tren de pulsos, donde
+cada pulso produce el avance de un micropaso del motor. Por lo tanto
+la frecuencia de esta onda es proporcional a la velocidad de avance del carro.
+
+Los valores aceptables para esta frecuencia son números enteros entre 31 y 12500 Hz.
+Esto conlleva la constitución de valores mínimos y máximos para el caudal
+dependiendo de la jeringa utilizada.
+
+Por este motivo al seleccionar un caudal en el Modo Flow-Rate o al seleccionar
+un tiempo en el Modo Volume-Time, el sistema realiza la verificación de si los
+valores seleccionados son alcanzables dada la calibracion de la jeringa.
+
+Además la escala de valores reales alcanzables queda discretizada.
+Esto se debe a que la frecuencia solo puede tomar valores enteros.
+Por lo tanto el sistema diferencia entre el valor consigna y el valor real.
+Por este motivo se decide que el modo de reajuste del caudal en tiempo real
+dentro del Modo Flow-Rate trabaje en base a la frecuencia.
+Es decir que se le permite al usuario establecer la frecuencia como consigna
+mostrando el caudal real derivado de dicha frecuencia.
+
+MANUAL DE USUARIO:
+─────────────────
+
+Utilizar las teclas UP y DOWN para desplazarse por el menu principal
+
+*----------------*
+|1 ← Fast Move → |
+|  Displace Cart |
+*----------------*
+
+Pantalla de bienvenida. Modo de movimiento rápido.
+Utilice las teclas LEFT y RIGHT para posicionar el carro.
+RIGHT: mueve el carro hacia atrás a fin de dar lugar a la jeringa.
+LEFT: mueve el carro hacia adelante a fin de tomar contacto con la jeringa.
+	│	*----------------*
+	└──>|ENDSTOP REACHED |
+		|                |
+		*----------------*
+		Si se acciona el Final de Carrera se muestra este mensaje
+		al intentar avanzar hacia adelante.
+		Util para calibrar el Tornillo de Final de Carrera
+		
+*----------------*
+|2 Calibrate     |
+|  Syringe       |
+*----------------*
+ │
+ │Presione SELECT para entrar a las pantallas de calibracion de la jeringa.
+ │	*----------------*
+ └─>|Syringe Length: |
+	|_58000 μm       |
+ │	*----------------*
+ │	Establecer la longitud de la jeringa.
+ │	Medir la distancia entre dos marcas de graduación de volumen.
+ │	El cursor titila indicando cuál cifra se modificará.
+ │	LEFT y RIGHT: mueve el cursor entre las posiciones decimales.
+ │	UP y DOWN: incrementa o decrementa el valor de la cifra seleccionada.
+ │	SELECT: Acepta el valor. Se muestra el mensaje de aceptación.
+ │		*----------------*
+ │		|Length Selected:|
+ │		|       58000 μm |
+ │		*----------------*
+ │
+ └─>*----------------*
+	|Syringe Volume: |
+	|__1000 μL       |
+	*----------------*
+	Establecer el volumen de la jeringa definido por las marcas de graduación.
+	LEFT, RIGHT, UP y DOWN: cambia las cifras.
+	SELECT: Acepta el valor. Muestra mensaje y vuelve al Menu Principal
+		*----------------*
+		|Volume Selected:|
+		|        1000 μL |
+		*----------------*
+				│
+<───────────────┘
+*----------------*
+|3 Enter Mode    |
+|  Flow-Rate     |
+*----------------*
+ │	Ingresar al Modo Caudal.
+ │	Una vez posicionado el carro y configurada la jeringa,
+ │	se ingresa a uno de los dos modos de RUN.
+ │	En este modo se selecciona un caudal y el sistema calcula
+ │	la velocidad de avance.
+ │	*----------------*
+ └─>|Flow-Rate:      | <────────────────────────────────────────────┐
+ │	|__5000 μL/h     |												│
+ │	*----------------*												│
+ │	Establecer el caudal   											│
+ │	LEFT, RIGHT, UP y DOWN: cambia las cifras.						│
+ │	SELECT: Acepta el valor. Calcula la velocidad necesaria.		│ 
+ │ 																	│
+ │	Si la velocidad no está en los limites operativos se solicita	│
+ │	que se vuelva a seleccionar el caudal.							│
+ │		*----------------*											│
+ │		|Must be:        |											│
+ │		|    89<Q<36188  | ─────────────────────────────────────────┘
+ │		*----------------*
+ │	Si el caudal esta dentro del limite operativose acepta el valor 
+ │  y se continua a la pantalla de Runinng.
+ │		*----------------*
+ └─────>|FlowRateAcepted:|
+	│	|    5000 μL/h   |
+	│	*----------------*
+	│ Pantalla de Runinng. El sistema queda listo para iniciar el bombeo.
+	│ La pantalla oscila entre las instrucciones de ejecucion
+	│ y la pantalla de información del caudal seteado.
+	│	*----------------*	  *----------------*
+	└──>| RIGHT TO START | <> | Set Point:     |
+	│	| LEFT TO CANCEL | <> | 5000 μL/h      |
+	│	*----------------*	  *----------------*
+	│	LEFT: cancela la operacion. Vuelve al Menu Principal.
+	│	RIGHT: inicia el bombeo
+	│		*----------------*
+	│		| Operation      |
+	│		| Cancelled      |
+	│		*----------------*
+<───────────────┘
+	│
+	│   Se inicia el bombeo. La pantalla continua oscilando
+	│   entre instrucciones y el caudal real.
+	│	Opcionalmente se puede ingresar al modo de ajuste en tiempo real.
+	│	*----------------*	  *----------------*	*----------------*
+	└──>|     RUNINNG    | <> |Flow Rate:      | <> | Press RIGHT to |<─────┐
+	 	| SELECT TO STOP | <> |   4999 μL/h    | <> |real-time adjust|		│
+	 	*----------------*	  *----------------*	*----------------*		│
+	 	SELECT: detiene el flujo.											│
+	 	RIGHT: ingresa al cambio de caudal sin detener la operación.		│
+		│	*----------------*												│	
+		│	|      FLOW      |												│
+		│	|    STOPPED     |												│
+		│	*----------------*												│
+<───────────────┘															│
+		│	*----------------*												│
+		└──>|F-R: 004999 μL/h|												│
+			|freq: _1727 Hz  |												│
+			*----------------*												│
+			En esta pantalla se puede seleccionar la frecuencia de			│
+			operacion mientras se continua con el bombeo.					│
+			Mediante el teclado se puede cambiar la frecuencia en tiempo	│	
+			real y el sistema muestra el caudal equivalente.				│
+			Se establece automaticamente que:  31<freq<10000.				│
+			LEFT, RIGHT, UP y DOWN: cambia las cifras de la frecuencia.		│
+			SELECT: Vuelve a la pantalla anterior ──────────────────────────┘
+		│
+		│	Si en cualquier momento durante el bombeo se acciona el 
+		│ 	el switch de final de carrera la operacion se aborta.
+		│	*----------------*	  *----------------*
+		└──>|Flow Aborted    | <> |Pres SELECT to  |
+			|Endstop Reached | <> |return Main Menu|
+			*----------------*	  *----------------*
+			SELECT: Quita la pantalla y vuelve al menu principal
+<────────────────────┘	
+
+*----------------*
+|4 Enter Mode    |
+|  Volume-Time   |
+*----------------*
+ │	Ingresar al Modo Volumen-Tiempo.
+ │	Una vez posicionado el carro y configurada la jeringa,
+ │	se ingresa a uno de los dos modos de RUN.
+ │	En este modo se selecciona un Volumen Total a bombear y 
+ │	un Tiempo Total en el cual se ejecutará el bombeo.
+ │	El sistema calculará la velocidad a la cual debe avanzar el carro.
+ │  Alcanzado el Tiempo Total, se detiene el avance del carro.
+ │	*----------------*
+ └─>|Total Volume:   |
+ │	|___500 μL       |
+ │	*----------------*
+ │	Establecer el volumen a ser bombeado.
+ │	Es responsabilidad del usuario que la jeringa
+ │  tenga el volumen suficiente de liquido.
+ │	LEFT, RIGHT, UP y DOWN: cambia las cifras.
+ │	SELECT: Acepta el valor. Continua a seleccion de tiempo.
+ │		*----------------*
+ │		|Volume Selected:|
+ │		|         500 μL |
+ │		*----------------*
+ │
+ │	*----------------*
+ └─>|Total Time:     | <────────────────────────────────────────────┐
+ │	|___360 Seconds  |												│
+ │	*----------------*												│
+ │	Establecer el tiempo total en el cual el volumen 				│
+ │  seleccionado debe ser bombeado.									│
+ │	LEFT, RIGHT, UP y DOWN: cambia las cifras.						│
+ │	SELECT: Acepta el valor. Calcula la velocidad necesaria.		│ 
+ │ 																	│
+ │	Si la velocidad no está en los limites operativos se solicita	│
+ │	que se vuelva a seleccionar un tiempo.							│
+ │		*----------------*											│
+ │		|Time must be:   |											│
+ │		|   124<t< 40113 | ─────────────────────────────────────────┘
+ │		*----------------*
+ │
+ │	Si la velocidad calculada está dentro de los límites operativos.
+ │  se acepta el valor y se continua a la pantalla de Runinng.
+ │		*----------------*
+ └─────>|Time Acepted:   |
+	│	|    360 Seconds |
+	│	*----------------*
+	│
+	│ Pantalla de Runinng. El sistema queda listo para iniciar el bombeo.
+	│ La pantalla oscila entre las instrucciones de ejecucion
+	│ y la información de Volumen-Tiempo
+	│	*----------------*	  *----------------*
+	└──>| RIGHT TO START | <> | 000/500 μL     |
+	│	| LEFT TO CANCEL | <> | 000/360 s      |
+	│	*----------------*	  *----------------*
+	│	LEFT cancela la operacion. Vuelve al Menu Principal.
+	│	RIGHT inicia el bombeo
+	│		*----------------*
+	│		| Operation      |
+	│		| Cancelled      |
+	│		*----------------*
+<───────────────┘
+	│
+	│   Se inicia el bombeo. La pantalla continua oscilando
+	│   entre instrucciones y el avance de la operación.
+	│	*----------------*	  *----------------*
+	└──>|     RUNINNG    | <> | 023/500 μL     |
+		| SELECT TO STOP | <> | 017/360 s      |
+		*----------------*	  *----------------*
+		SELECT detiene el flujo.
+			*----------------*	  *----------------*
+			| FLOW STOPPED   | <> | 053/500 μL     |
+			| SELECT TO MENU | <> | 038/360 s      |
+			*----------------*	  *----------------*
+			SELECT para retornar al Menu Principal
+<───────────────┘
+    
+         Si se alcanza el tiempo total se muestra un mensaje.
+			*----------------*	  *----------------*
+			| FLOW FINISHED  | <> | 500/500 μL     |
+			| SELECT TO MENU | <> | 360/360 s      |
+			*----------------*	  *----------------*
+			SELECT para retornar al Menu Principal
+<───────────────┘
+		│
+		│	Si en cualquier momento durante el bombeo se acciona el 
+		│ 	el switch de final de carrera la operacion se aborta.
+		│	*----------------*	  *----------------*
+		└──>|Flow Aborted    | <> |Pres SELECT to  |
+			|Endstop Reached | <> |return Main Menu|
+			*----------------*	  *----------------*
+			SELECT: Quita la pantalla y vuelve al menu principal
+<────────────────────┘	
+
+	
+*----------------*
+|5 Serial Mode   |
+|  StartListening|
+*----------------*
+ │  Presionar SELECT para entrar al modo de control por serial
+ │	*----------------*
+ └─>|Listening Serial|
+ 	|---             |
+ 	*----------------*
+	Si recibe un mensaje lo muestra y ejecuta la operacion asociada
+		*----------------*
+		|Listening Serial|
+		|2 Stop          |
+		*----------------*
+    SELECT: Detiene el movimiento, si había, finaliza el modo serial
+	y vuelve al Menu Principal
+		*----------------*
+		|  Flow Stopped  |
+		| Serial Finished|
+		*----------------*
+				│
+<───────────────┘
+
+*----------------*
+|6 Info-Version  |
+|                |
+*----------------*
+ │  Presionar SELECT para entrar a la pantalla de información.
+ │	*----------------*
+ └─>|Firm:V2.0 221018|
+ 	|LFD FIUBA       |
+ 	*----------------*
+	UP y DOWN: Muestra mas información.
+	SELECT: Vuelve al Menu Principal.
+				│
+<───────────────┘	
+
+
+
+
+DATOS TECNICOS:
+───────────────
+Alimentacion:
+12 V DC 1 A
+
+Componentes:
+Nema 17 planetary geared stepper motor
+Microstepping Driver TB6600
+Arduino Mega2560 + LCD Keypad Shield
+
+Especificaciones del tren motor:
+1 periodo / 1 pulso
+32 pulsos / 1 paso  (seteado en TB6600 1-OFF 2-OFF 3-OFF)
+200 pasos / 1 vueltaMotor  (del motor)
+26.851239 vueltaMotor / 1 vueltaEje (del reductor)
+vueltaEje / 8.0 mm (del datashet de la rosca)
+Valor teorico: 21841 +/- 380
+
+Calibración experimental:
+21440+/-10 pulsos por mm
+(puede variar en cada unidad)
+
+CONTROL POR MODO SERIAL:
+────────────────────────
+En el modo serial se envian mensajes desde una PC a fin de controlar la bomba.
+A fin de ofrecer versatilidad en el control las operaciones son de bajo nivel.
+
+Los comandos son números enteros 0<N<65535.
+El comando 6 es especial ya que es el unico que requiere un parámetro.
+
+
+Comando	(input)	Leyenda LCD			Respuesta Serial 
+───────────────────────────────────────────────────────────────────
+"1"				1 Disable			Current Disabled
+"2"				2 Enable			Current Enabled
+"3"				3 Forward			Direction: Forward
+"4"				4 Backward			Direction: Backward
+"5"				5 No tone			Generator Off
+"6"				6 Step: listen		Listening number of steps
+"7"				7 Return Cal		Calibration (periods/mm):
+									21440
+"8"				8 Report			Firmware:
+									Firm V2.0 221018
+"9"				9 Ping				pong
+N>30			N Hz				New frequency established: N Hz
+N after "6"		6 Step: N			N steps executed
+				- EndstopReached	Aborted Endstop Reached
+
+El comando -EndstopReached no es un comando habilitado al usuario.
+Es un comando que ejecuta la placa cuando detecta el fin de carrera,
+interrumpiendo la operacion en curso. Equivale a la secuencia "1 5",
+apagar la corriente y apagar el generador.
+
+Ejemplos:
+
+Secuencia:
+"3 1500 2"
+Efecto: Avanzar el carro hacia adelante a una frecuencia de 1500 Hz.
+NOTA: si el generador estaba apagado "3 2 1500" tiene el mismo efecto
+
+Secuencia:
+"3 100 2"
+delay1
+"5"
+delay2
+"200"
+Efecto: Avanzar a 100Hz. Luego de un delay1 detiene el movimiento
+apagando el generador. Luego de un delay2, avanza a 200Hz.
+
+Secuencia:
+"3 100 2"
+delay1
+"1"
+delay2
+"200"
+Efecto: Avanzar a 100Hz. Luego de un delay1 detiene el movimiento
+apagando la corriente. Luego de un delay2, establece la frecuencia 200Hz,
+pero el carro sigue detenido.
+
+Secuencia:
+"3 2 35000"
+Efecto: Intenta avanzar a 35KHz, pero el motor patinará.
+En general el límite para que no patine es 12.5KHz
+
+Secuencia:
+"4 2 5000"
+delay1
+"10000"
+delay2
+"15000"
+delay3
+"25000"
+delay4
+"30000"
+Efecto: Retrocede el carro en una rampa de velocidad creciente.
+Util para alcanzar velocidades superiores a 12.5KHz
+
+Secuencia:
+"5 2 3 6 21440"
+Efecto: dentener el generador, y avanzar el carro 21440 pasos.
+Según la calibracion el carro avanzará 1 mm
